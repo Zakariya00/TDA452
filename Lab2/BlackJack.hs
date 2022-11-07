@@ -4,6 +4,8 @@ import Cards
 import RunGame 
 import Test.QuickCheck
 
+-- ghci -package random
+-- :m System.Random
 -- hand1 = Hand (Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty))
 
 -- A0 --
@@ -19,7 +21,8 @@ size hand2
 
 -- A1 --
 displayCard :: Card -> String
-displayCard (Card r s)   = "" ++ show (r) ++ " of " ++ show (s)
+displayCard (Card (Numeric r) s)   = "" ++ show (r) ++ " of " ++ show (s)
+displayCard (Card r s)             = "" ++ show (r) ++ " of " ++ show (s)
 
 display :: Hand -> String
 display Empty            = ""
