@@ -10,6 +10,8 @@ import Test.QuickCheck
 
 -- A0 --
 {-
+
+--By Hand
 size hand2
   = size (Add (Card (Numeric 2) Hearts)
               (Add (Card Jack Spades) Empty))
@@ -17,6 +19,14 @@ size hand2
   = 1 + 1 + size (Empty)
   = 1 + 1 + 0
   = 2
+
+
+ hand1 = Add (Card Jack Spades)(Add(Card (Numeric 5) Hearts)(Add (Card (Numeric 7) Spades) Empty))
+
+     sizeSteps :: [Integer]
+      sizeSteps = [size hand1, size(Add (Card Jack Spades)
+                          (Add(Card (Numeric 5) Hearts)
+                           (Add (Card (Numeric 7) Spades) Empty))), 3]
 -}
 
 -- A1 --
