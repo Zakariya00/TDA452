@@ -6,12 +6,11 @@ import Test.QuickCheck
 
 -- ghci -package random
 -- :m System.Random
--- hand1 = Hand (Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty))
+-- hand1 = Hand (Add (Card (Numeric 2) Hearts)(Add (Card Jack Spades) Empty))
 
 -- A0 --
-{-
-
 --By Hand
+{--
 size hand2
   = size (Add (Card (Numeric 2) Hearts)
               (Add (Card Jack Spades) Empty))
@@ -19,15 +18,20 @@ size hand2
   = 1 + 1 + size (Empty)
   = 1 + 1 + 0
   = 2
+-}
 
 -- As definition
- hand1 = Add (Card Jack Spades)(Add(Card (Numeric 5) Hearts)(Add (Card (Numeric 7) Spades) Empty))
+hand2 = Add (Card (Numeric 2) Hearts)
+            (Add (Card Jack Spades) Empty)
 
-     sizeSteps :: [Integer]
-      sizeSteps = [size hand1, size(Add (Card Jack Spades)
-                          (Add(Card (Numeric 5) Hearts)
-                           (Add (Card (Numeric 7) Spades) Empty))), 3]
--}
+sizeSteps :: [Integer]
+sizeSteps = [ size hand2
+            , size (Add (Card (Numeric 2) Hearts)
+                        (Add (Card Jack Spades) Empty))
+                        , 1 + size (Add (Card Jack Spades) Empty)
+                        , 1 + 1
+                        , 2]
+
 
 -- A1 --
 -- | The string representation of a Card
@@ -130,6 +134,7 @@ playBankHelper deck hand
 
 -- B6 --
 -- | Interface Implementation
+{-
 implementation = Interface
   { iFullDeck = fullDeck
   , iValue    = value
@@ -143,7 +148,7 @@ implementation = Interface
 
   main :: IO ()
   main = runGame implementation
-
+-}
 
 
 
