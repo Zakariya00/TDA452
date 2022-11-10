@@ -4,13 +4,9 @@ import Cards
 import RunGame 
 import Test.QuickCheck
 
--- ghci -package random
--- :m System.Random
--- hand1 = Hand (Add (Card (Numeric 2) Hearts)(Add (Card Jack Spades) Empty))
-
 -- A0 --
 --By Hand
-{--
+{-
 size hand2
   = size (Add (Card (Numeric 2) Hearts)
               (Add (Card Jack Spades) Empty))
@@ -31,7 +27,6 @@ sizeSteps = [ size hand2
                         , 1 + size (Add (Card Jack Spades) Empty)
                         , 1 + 1
                         , 2]
-
 
 -- A1 --
 -- | The string representation of a Card
