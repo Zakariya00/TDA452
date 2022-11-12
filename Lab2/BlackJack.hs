@@ -3,10 +3,14 @@ module BlackJack where
 import Cards 
 import RunGame 
 import Test.QuickCheck
+import System.Random
 
 -- A0 --
 --By Hand
 {-
+hand2 = Add (Card (Numeric 2) Hearts)
+            (Add (Card Jack Spades) Empty)
+
 size hand2
   = size (Add (Card (Numeric 2) Hearts)
               (Add (Card Jack Spades) Empty))
@@ -121,15 +125,43 @@ playBankHelper deck hand
   where (smallerDeck,biggerHand) = draw deck hand
 
 -- B5 --
--- |
+-- | Returns shuffled deck, (shuffles using helper functions)
+shuffleDeck :: StdGen -> Hand -> Hand
+shuffleDeck g h = shuffleDeck' g h Empty
+
+shuffleDeck' g deck newDeck
+          | deck == Empty          = newDeck
+          | otherwise              = shuffleDeck' g1 oldDeck (Add card newDeck)
+  where (rInt, g1)      = randomR (1, (size deck)) g
+        (card, oldDeck) = nthCard deck rInt
 
 
+-- Helper function, removes the nth Card
+-- (returns removed card and the new deck)
+nthCard :: Hand -> Integer -> (Card, Hand)
+nthCard h nth = nthCard' h Empty nth
 
+nthCard' (Add c h) h1 nth
+          | nth > size (Add c h)   = error "nth is out of bound"
+          | nth == 1               = (c, (h<+h1))
+          | otherwise              = nthCard' deck checkedHand (nth - 1)
+  where (deck, checkedHand) = draw (Add c h) h1
 
+-- Helper function, checks if card is in hand
+belongsTo :: Card -> Hand -> Bool
+c `belongsTo` Empty = False
+c `belongsTo` (Add c' h) = c == c' || c `belongsTo` h
+
+-- Tests (4 proper shuffle)
+prop_shuffle_sameCards :: StdGen -> Card -> Hand -> Bool
+prop_shuffle_sameCards g c h =
+    c `belongsTo` h == c `belongsTo` shuffleDeck g h
+prop_size_shuffle :: StdGen -> Hand -> Bool
+prop_size_shuffle g h =
+    size h == size (shuffleDeck g h)
 
 -- B6 --
 -- | Interface Implementation
-{-
 implementation = Interface
   { iFullDeck = fullDeck
   , iValue    = value
@@ -141,9 +173,8 @@ implementation = Interface
   , iShuffle  = shuffleDeck
   }
 
-  main :: IO ()
-  main = runGame implementation
--}
+main :: IO ()
+main = runGame implementation
 
 
 
