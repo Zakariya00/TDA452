@@ -1,6 +1,9 @@
 module Sudoku where
 
 import Test.QuickCheck
+import Data.Char
+import Data.Maybe
+import Data.List
 
 ------------------------------------------------------------------------------
 
@@ -36,21 +39,34 @@ example =
 
 -- | allBlankSudoku is a sudoku with just blanks
 allBlankSudoku :: Sudoku
-allBlankSudoku = undefined
+allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 
 -- * A2
 
 -- | isSudoku sud checks if sud is really a valid representation of a sudoku
 -- puzzle
 isSudoku :: Sudoku -> Bool
-isSudoku = undefined
+isSudoku s = validRows && validColAndRows
+  where
+     validRows         = length (rows s) == 9
+     validColAndRows   = and (map (\row -> length row == 9 &&
+                          and (map validElement row)) (rows s))
+
+-- | Helper function, checks if cell values are valid for Sudoku
+validElement :: Maybe Int -> Bool
+validElement Nothing   = True
+validElement (Just e)  = elem e [1..9]
 
 -- * A3
 
 -- | isFilled sud checks if sud is completely filled in,
 -- i.e. there are no blanks
 isFilled :: Sudoku -> Bool
-isFilled = undefined
+isFilled s = and (map (\row -> and (map filledElement row)) (rows s))
+
+filledElement :: Maybe Int -> Bool
+filledElement (Just e)  = elem e [1..9]
+filledElement Nothing   = False
 
 ------------------------------------------------------------------------------
 
@@ -59,15 +75,37 @@ isFilled = undefined
 -- | printSudoku sud prints a nice representation of the sudoku sud on
 -- the screen
 printSudoku :: Sudoku -> IO ()
-printSudoku = undefined
+printSudoku s = putStrLn (printRow (rows s))
+
+printRow:: [[Maybe Int]] -> String
+printRow []      = ""
+printRow [x]     = map toChar x
+printRow (x:xs)  = map toChar x ++ "\n" ++ printRow xs
+
+-- | Helper function, for converting Maybe Int to char
+toChar :: Maybe Int -> Char
+toChar Nothing   = '.'
+toChar (Just e)  = intToDigit e
 
 -- * B2
 
 -- | readSudoku file reads from the file, and either delivers it, or stops
 -- if the file did not contain a sudoku
 readSudoku :: FilePath -> IO Sudoku
-readSudoku = undefined
+readSudoku fPath =
+                   do
+                      fileData <- readFile fPath
+                      let fLines = lines fileData
+                      let s      = Sudoku $ map (map fromChar) $ fLines
+                      if (isSudoku s) then return s
+                      else error "Not a valid Sudoku <Failed isSudoku Check>"
 
+-- | Helper function, for converting Char to Maybe Int
+fromChar :: Char -> Maybe Int
+fromChar '.' = Nothing
+fromChar  c
+    | isDigit c   = Just (digitToInt c)
+    | otherwise   = error "Not a valid Sudoku <Failed fromChar Check>"
 ------------------------------------------------------------------------------
 
 -- * C1
