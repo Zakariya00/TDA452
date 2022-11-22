@@ -145,7 +145,11 @@ type Block = [Cell] -- a Row is also a Cell
 -- * D1
 
 isOkayBlock :: Block -> Bool
-isOkayBlock = undefined
+isOkayBlock []            = True
+isOkayBlock (Nothing:r)   = isOkayBlock r
+isOkayBlock (c:r)
+    | elem c r     = False
+    | otherwise    = isOkayBlock r
 
 
 -- * D2
@@ -159,7 +163,7 @@ prop_blocks_lengths = undefined
 -- * D3
 
 isOkay :: Sudoku -> Bool
-isOkay = undefined
+isOkay s = undefined
 
 
 ---- Part A ends here --------------------------------------------------------
