@@ -46,11 +46,11 @@ allBlankSudoku = Sudoku (replicate 9 (replicate 9 Nothing))
 -- | isSudoku sud checks if sud is really a valid representation of a sudoku
 -- puzzle
 isSudoku :: Sudoku -> Bool
-isSudoku s = validRows && validColAndRows
+isSudoku s = validRows && validColAndValues
   where
-     validRows         = length (rows s) == 9
-     validColAndRows   = and (map (\row -> length row == 9 &&
-                          and (map validElement row)) (rows s))
+     validRows          = length (rows s) == 9
+     validColAndValues  = and (map (\row -> length row == 9 &&
+                           and (map validElement row)) (rows s))
 
 -- | Helper function, checks if cell values are valid for Sudoku
 validElement :: Maybe Int -> Bool
@@ -96,7 +96,7 @@ readSudoku fPath =
                    do
                       fileData <- readFile fPath
                       let fLines = lines fileData
-                      let s      = Sudoku $ map (map fromChar) $ fLines
+                      let s      = Sudoku $ map (map fromChar) fLines
                       if (isSudoku s) then return s
                       else error "Not a valid Sudoku <Failed isSudoku Check>"
 
@@ -112,21 +112,29 @@ fromChar  c
 
 -- | cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Cell)
-cell = undefined
+cell = frequency [ (1, return Nothing),
+                    (9,  do
+                           n <- choose (1,9)
+                           let e = Just n
+                           return e)
+                           ]
 
 
 -- * C2
 
 -- | an instance for generating Arbitrary Sudokus
 instance Arbitrary Sudoku where
-  arbitrary = undefined
-
+  arbitrary =
+               do
+                 r <- vectorOf 9 (vectorOf 9 cell)
+                 let rs = Sudoku r
+                 return rs
  -- hint: get to know the QuickCheck function vectorOf
  
 -- * C3
 
 prop_Sudoku :: Sudoku -> Bool
-prop_Sudoku = undefined
+prop_Sudoku = isSudoku
   -- hint: this definition is simple!
   
 ------------------------------------------------------------------------------
