@@ -77,6 +77,7 @@ filledElement Nothing   = False
 printSudoku :: Sudoku -> IO ()
 printSudoku s = putStrLn (printRow (rows s))
 
+-- | Helper function, prints each row recursively
 printRow:: [[Maybe Int]] -> String
 printRow []      = ""
 printRow [x]     = map toChar x
@@ -130,9 +131,10 @@ instance Arbitrary Sudoku where
                  let rs = Sudoku r
                  return rs
  -- hint: get to know the QuickCheck function vectorOf
- 
+
 -- * C3
 
+-- | Property that expresses that each generated Sudoku actually is a Sudoku
 prop_Sudoku :: Sudoku -> Bool
 prop_Sudoku = isSudoku
   -- hint: this definition is simple!
@@ -144,6 +146,7 @@ type Block = [Cell] -- a Row is also a Cell
 
 -- * D1
 
+-- |  checks if supplied block does not contain the same digit twice
 isOkayBlock :: Block -> Bool
 isOkayBlock []            = True
 isOkayBlock (Nothing:r)   = isOkayBlock r
@@ -154,16 +157,42 @@ isOkayBlock (c:r)
 
 -- * D2
 
+ -- |  Given a Sudoku, creates a list of all blocks of that Sudoku. [9 rows, 9 col, 27 blocks]
 blocks :: Sudoku -> [Block]
-blocks = undefined
+blocks s  = rows s ++ transpose (rows s) ++ miniblocks (rows s) []
 
+ -- |  Helper function for creating 3x3 blocks out of given Sudoku rows
+miniblocks:: [Row] -> [Block] -> [Block]
+miniblocks [] acc             = acc
+miniblocks (r1:r2:r3:rs) acc  = miniblocks rs (
+                                                (c11++c21++c31):(c12++c22++c32):(c13++c23++c33):acc
+                                                )
+  where
+     [c11, c12, c13]  = splitrow r1
+     [c21, c22, c23]  = splitrow r2
+     [c31, c32, c33]  = splitrow r3
+
+ -- |  Helper function for splitting a row into 3 with 3x1
+splitrow:: Row -> [[Maybe Int]]
+splitrow r = [r1,r2,r3]
+  where
+     (r1, rem)   = splitAt 3 r
+     (r2, rem1)  = splitAt 3 rem
+     (r3, _   )  = splitAt 3 rem1
+
+ -- |  Property that states that, for each Sudoku, there are 27 blocks, and each block has exactly 9 cells
 prop_blocks_lengths :: Sudoku -> Bool
-prop_blocks_lengths = undefined
+prop_blocks_lengths s = validBlocks && validBlockCells
+  where
+     validBlocks          = length (blocks s) == 27
+     validBlockCells      = and (map (\block -> length block == 9 ) (blocks s))
+
 
 -- * D3
 
+ -- | Given a Sudoku, checks that all rows, columns, and 3x3 blocks do not contain repeated digits
 isOkay :: Sudoku -> Bool
-isOkay s = undefined
+isOkay s = and (map isOkayBlock (blocks s))
 
 
 ---- Part A ends here --------------------------------------------------------
