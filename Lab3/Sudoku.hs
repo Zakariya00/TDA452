@@ -113,8 +113,8 @@ fromChar  c
 
 -- | cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Cell)
-cell = frequency [ (1, return Nothing),
-                    (9,  do
+cell = frequency [ (9, return Nothing),
+                    (1,  do
                            n <- choose (1,9)
                            let e = Just n
                            return e)
