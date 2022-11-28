@@ -206,40 +206,85 @@ type Pos = (Int,Int)
 
 -- * E1
 
+ -- | Given a Sudoku returns a list of the positions in the Sudoku that are still blank
 blanks :: Sudoku -> [Pos]
-blanks = undefined
+blanks s = [(x,y) | x <- [0..8],
+                    y <- [0..8],
+                    ((rows s !! x)!!y) == Nothing]
 
---prop_blanks_allBlanks :: ...
---prop_blanks_allBlanks =
+ -- | Property that checks that the blanks of allBlankSudoku are indeed all of the expected 9x9 cells
+prop_blanks_allBlanks :: Sudoku -> Bool
+prop_blanks_allBlanks s =  length (rows s) == 9 &&
+                            and (map (\row -> length row == 9 &&
+                             and (map (\x -> x == Nothing) row)) (rows s))
 
 
 -- * E2
 
+ -- | Given a list, and a tuple containing an index in the list and a new value,
+ --   updates the given list with the new value at the given index
 (!!=) :: [a] -> (Int,a) -> [a]
-xs !!= (i,y) = undefined
+[] !!= (_,_)     = []
+[x] !!= (0,y)    = [y]
+xs !!= (i,y)
+    | i > (length xs - 1)   = error "Index Out Of Bound"
+    | otherwise = newL
+  where
+     (h,(_:t))      = splitAt i xs
+     newL           = h ++ y:t
 
---prop_bangBangEquals_correct :: ...
---prop_bangBangEquals_correct =
+ -- | Property that state(s) the expected properties of this function
+prop_bangBangEquals_correct :: Eq a => [a] -> (Int,a) -> Bool
+prop_bangBangEquals_correct xs (i,e) = (length xs == length ys) &&
+                                       ((ys!!i) == e)
+  where
+     ys      = xs !!= (i,e)
 
 
 -- * E3
 
+ -- | Given a Sudoku, a position, and a new cell value,
+ --   updates the given Sudoku at the given position with the new value
 update :: Sudoku -> Pos -> Cell -> Sudoku
-update = undefined
+update s (i,j) x
+    | (i > 8) || (j > 8)   = error "Index Out Of Bound"
+    | otherwise = updatedS
+  where
+    row            = (rows s)!!i
+    updatedR       = row !!= (j,x)
+    updatedS       = Sudoku ((rows s) !!= (i,updatedR))
 
---prop_update_updated :: ...
---prop_update_updated =
+ -- | Property that checks that the updated position really has gotten the new value
+prop_update_updated :: Sudoku -> Pos -> Maybe Int -> Bool
+prop_update_updated s (i,j) e = ((rows s'!!i)!!j) == e
+  where s' = update s (i,j) e
 
 
 ------------------------------------------------------------------------------
 
 -- * F1
 
+ -- |
+solve :: Sudoku -> Maybe Sudoku
+solve = undefined
+
 
 -- * F2
+
+ -- |
+readAndSolve :: FilePath -> IO ()
+readAndSolve = undefined
 
 
 -- * F3
 
+ -- |
+isSolutionOf :: Sudoku -> Sudoku -> Bool
+isSolutionOf = undefined
+
 
 -- * F4
+
+ -- |
+prop_SolveSound :: Sudoku -> Property
+prop_SolveSound = undefined
