@@ -264,27 +264,36 @@ prop_update_updated s (i,j) e = ((rows s'!!i)!!j) == e
 
 -- * F1
 
- -- |
+ -- | Solves a given Sudoku
 solve :: Sudoku -> Maybe Sudoku
-solve = undefined
-
+solve s = Just s
+solve _ = Nothing
 
 -- * F2
 
- -- |
+ -- | Produces instructions for reading the Sudoku from the given file,
+ --  solving it, and printing the answer
 readAndSolve :: FilePath -> IO ()
-readAndSolve = undefined
+readAndSolve fPath =
+                   do
+                   s <- readSudoku fPath
+                   case solve s of
+                    Nothing -> putStrLn "(no solution)"
+                    Just s -> printSudoku s
 
 
 -- * F3
 
- -- |
+ -- | Checks, given two Sudokus, whether the first one is a solution,
+ --   and also whether the first one is a solution of the second one.
 isSolutionOf :: Sudoku -> Sudoku -> Bool
-isSolutionOf = undefined
+isSolutionOf sol s = isOkay sol && isFilled sol && isSolOf
+  where isSolOf = and [ ((rows sol!!i) == (rows s!!i)) | i <- [0..8]]
 
 
 -- * F4
 
- -- |
+ -- | Property that says that the function solve is sound. Soundness means that every supposed
+ --   solution produced by solve actually is a valid solution to the original problem.
 prop_SolveSound :: Sudoku -> Property
 prop_SolveSound = undefined
