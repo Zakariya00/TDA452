@@ -267,12 +267,14 @@ prop_update_updated s (i,j) e = ((rows s'!!i)!!j) == e
  -- | Solves a given Sudoku
 solve :: Sudoku -> Maybe Sudoku
 solve s
-    | not (isSudoku s && isOkay s) = Nothing
-    | isFilled s                   = Just s
-    | otherwise                    = solve s
+     | not (isSudoku s || isOkay s) = Nothing
+     | isFilled s                   = Just s
+     | otherwise                    = solve' s (blanks s)
 
 solve' :: Sudoku -> [Pos] -> Maybe Sudoku
-solve' s pos = undefined
+solve' s [] = Just s
+solve' s (p:ps) = listToMaybe (catMaybes (map solve updatedL))
+ where updatedL = [update s p (Just x) | x <- [1..9], isOkay (update s p (Just x))]
 
 
 -- * F2
@@ -294,7 +296,9 @@ readAndSolve fPath =
  --   and also whether the first one is a solution of the second one.
 isSolutionOf :: Sudoku -> Sudoku -> Bool
 isSolutionOf sol s = isOkay sol && isFilled sol && isSolOf
-  where isSolOf = and [((rows sol!!i) == (rows s!!i)) | i <- [0..8]]
+ where isSolOf = and [(((rows sol!!x)!!y) == ((rows s!!x)!!y)) | x <- [0..8],
+                                                                 y <- [0..8],
+                                                                 ((rows s !! x)!!y) /= Nothing]
 
 
 -- * F4
@@ -304,3 +308,5 @@ isSolutionOf sol s = isOkay sol && isFilled sol && isSolOf
 prop_SolveSound :: Sudoku -> Property
 prop_SolveSound s = isSudoku s && isOkay s ==> isSolutionOf sol s
   where Just sol = solve s
+
+fewerChecks prop = quickCheckWith stdArgs{ maxSuccess = 10 } prop
