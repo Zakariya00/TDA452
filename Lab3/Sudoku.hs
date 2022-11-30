@@ -213,10 +213,11 @@ blanks s = [(x,y) | x <- [0..8],
                     ((rows s !! x)!!y) == Nothing]
 
  -- | Property that checks that the blanks of allBlankSudoku are indeed all of the expected 9x9 cells
-prop_blanks_allBlanks :: Sudoku -> Bool
-prop_blanks_allBlanks s =  length (rows s) == 9 &&
+prop_blanks_allBlanks :: Bool
+prop_blanks_allBlanks  =  length (rows s) == 9 &&
                             and (map (\row -> length row == 9 &&
                              and (map (\x -> x == Nothing) row)) (rows s))
+ where s = allBlankSudoku
 
 
 -- * E2
@@ -224,30 +225,28 @@ prop_blanks_allBlanks s =  length (rows s) == 9 &&
  -- | Given a list, and a tuple containing an index in the list and a new value,
  --   updates the given list with the new value at the given index
 (!!=) :: [a] -> (Int,a) -> [a]
-[] !!= (_,_)     = []
+[] !!= (_,_)     = error "Empty, index automatically out of bound"
 [x] !!= (0,y)    = [y]
 xs !!= (i,y)
-    | i > (length xs - 1)   = error "Index Out Of Bound"
-    | otherwise = newL
+    | i > (length xs - 1)  || (i < 0) = error "Index Out Of Bound"
+    | otherwise                       = newL
   where
      (h,(_:t))      = splitAt i xs
      newL           = h ++ y:t
 
  -- | Property that state(s) the expected properties of this function
-prop_bangBangEquals_correct :: Eq a => [a] -> (Int,a) -> Bool
-prop_bangBangEquals_correct xs (i,e) = (length xs == length ys) &&
-                                       ((ys!!i) == e)
-  where
-     ys      = xs !!= (i,e)
+prop_bangBangEquals_correct :: [Sudoku] -> (Int,Sudoku) -> Bool
+prop_bangBangEquals_correct xs (i,e) = length xs == length ys && ((ys!!i) == e)
+  where ys = xs !!= (i,e)
 
 
 -- * E3
 
  -- | Given a Sudoku, a position, and a new cell value,
  --   updates the given Sudoku at the given position with the new value
-update :: Sudoku -> Pos -> Cell -> Sudoku
+update :: Sudoku -> Pos -> Maybe Int -> Sudoku
 update s (i,j) x
-    | (i > 8) || (j > 8)   = error "Index Out Of Bound"
+    | (i > 8) || (j > 8) || (i < 0) || (j < 0)   = error "Index Out Of Bound"
     | otherwise = updatedS
   where
     row            = (rows s)!!i
