@@ -238,7 +238,7 @@ xs !!= (i,y)
 prop_bangBangEquals_correct :: Sudoku -> (Int,Row) -> Bool
 prop_bangBangEquals_correct xs (i,e) = length (rows xs) == length (rows ys) && ((rows ys)!!abs i') == e
   where ys = Sudoku ((rows xs) !!= (abs i',e))
-        i' = mod i 8
+        i' = mod i 9
 
 
 -- * E3
@@ -258,8 +258,8 @@ update s (i,j) x
 prop_update_updated :: Sudoku -> Pos -> Maybe Int -> Bool
 prop_update_updated s (i,j) e = ((rows s'!!abs i')!!abs j') == e
   where s' = update s (abs i', abs j') e
-        i' = mod i 8
-        j' = mod j 8
+        i' = mod i 9
+        j' = mod j 9
 
 
 ------------------------------------------------------------------------------
