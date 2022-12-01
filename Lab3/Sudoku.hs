@@ -235,9 +235,10 @@ xs !!= (i,y)
      newL           = h ++ y:t
 
  -- | Property that state(s) the expected properties of this function
-prop_bangBangEquals_correct :: [Sudoku] -> (Int,Sudoku) -> Bool
-prop_bangBangEquals_correct xs (i,e) = length xs == length ys && ((ys!!i) == e)
-  where ys = xs !!= (i,e)
+prop_bangBangEquals_correct :: Sudoku -> (Int,Row) -> Bool
+prop_bangBangEquals_correct xs (i,e) = length (rows xs) == length (rows ys) && ((rows ys)!!abs i') == e
+  where ys = Sudoku ((rows xs) !!= (abs i',e))
+        i' = mod i 8
 
 
 -- * E3
@@ -255,8 +256,10 @@ update s (i,j) x
 
  -- | Property that checks that the updated position really has gotten the new value
 prop_update_updated :: Sudoku -> Pos -> Maybe Int -> Bool
-prop_update_updated s (i,j) e = ((rows s'!!i)!!j) == e
-  where s' = update s (i,j) e
+prop_update_updated s (i,j) e = ((rows s'!!abs i')!!abs j') == e
+  where s' = update s (abs i', abs j') e
+        i' = mod i 8
+        j' = mod j 8
 
 
 ------------------------------------------------------------------------------
