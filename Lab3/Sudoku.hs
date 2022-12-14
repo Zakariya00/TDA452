@@ -216,7 +216,8 @@ blanks s = [(x,y) | x <- [0..8],
 prop_blanks_allBlanks :: Bool
 prop_blanks_allBlanks  =  length (rows s) == 9 &&
                             and (map (\row -> length row == 9 &&
-                             and (map (\x -> x == Nothing) row)) (rows s))
+                             and (map (\x -> x == Nothing) row)) (rows s)) &&
+                              length (blanks s) == (9*9)
  where s = allBlankSudoku
 
 
@@ -275,7 +276,7 @@ solve s
 
 solve' :: Sudoku -> [Pos] -> Maybe Sudoku
 solve' s [] = Just s
-solve' s (p:ps) = listToMaybe (catMaybes (map solve updatedL))
+solve' s (p:ps) = listToMaybe (catMaybes (map (`solve'` ps) updatedL))
  where updatedL = [update s p (Just x) | x <- [1..9], isOkay (update s p (Just x))]
 
 
